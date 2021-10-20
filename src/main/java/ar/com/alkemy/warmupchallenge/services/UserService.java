@@ -40,4 +40,8 @@ public class UserService {
         return repo.findByEmail(username);
     }
 
+    public User findByUserId(Integer id) {
+        return repo.findByUserId(id);
+    }
+
 }
