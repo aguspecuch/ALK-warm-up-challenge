@@ -8,10 +8,14 @@ public class User {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="user_id")
     private Integer userId;
+    @Column(name="full_name")
     private String fullName;
     private String email;
+    private String username;
     private String password;
+
 
     public Integer getUserId() {
         return userId;
@@ -30,6 +34,12 @@ public class User {
     }
     public void setEmail(String email) {
         this.email = email;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
     }
     public String getPassword() {
         return password;
