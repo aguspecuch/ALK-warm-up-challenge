@@ -27,8 +27,8 @@ public class UserController {
     @Autowired
     UserService service;
 
-    @PostMapping("/register")
-    public ResponseEntity<GenericResponse> register(@RequestBody User user) {
+    @PostMapping("/sign_up")
+    public ResponseEntity<GenericResponse> signUp(@RequestBody User user) {
 
         User u = service.register(user);
         GenericResponse r = new GenericResponse();
@@ -43,11 +43,11 @@ public class UserController {
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
 
         User u = service.login(req.username, req.password);
-        String token = getJWTToken(u.getUsername());
+        String token = getJWTToken(u.getEmail());
 
         LoginResponse r = new LoginResponse();
         r.id = u.getUserId();
-        r.username = u.getUsername();
+        r.username = u.getEmail();
         r.token = token;
 
         return ResponseEntity.ok(r);

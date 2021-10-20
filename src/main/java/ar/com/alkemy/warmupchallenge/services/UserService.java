@@ -17,9 +17,7 @@ public class UserService {
     public User register(User user) {
 
         User u = new User();
-        u.setFullName(user.getFullName());
         u.setEmail(user.getEmail());
-        u.setUsername(user.getUsername());
         u.setPassword(Crypto.encrypt(user.getPassword(), user.getEmail().toLowerCase()));
 
         return repo.save(u);
@@ -39,7 +37,7 @@ public class UserService {
     }
 
     public User findByUsername(String username) {
-        return repo.findByUsername(username);
+        return repo.findByEmail(username);
     }
 
 }

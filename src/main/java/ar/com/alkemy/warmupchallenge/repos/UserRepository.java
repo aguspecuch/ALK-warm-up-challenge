@@ -9,6 +9,5 @@ import ar.com.alkemy.warmupchallenge.entities.User;
 public interface UserRepository extends JpaRepository<User, Integer> {
     
     User findByUserId(Integer userId);
-    User findByUsername(String username);
     User findByEmail(String email);
 }
