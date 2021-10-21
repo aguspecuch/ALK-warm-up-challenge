@@ -1,6 +1,7 @@
 package ar.com.alkemy.warmupchallenge.services;
 
 import java.util.List;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,9 +51,13 @@ public class PostService {
     }
 
     public boolean validateData(Post post) {
-        if ( this.findById(post.getPostId()) != null ) 
+        if (this.findById(post.getPostId()) != null)
             return false;
-        if ( !(this.validateUrl(post.getImage())))
+        if (this.findByTitle(post.getTitle()) != null)
+            return false;
+        if (!(this.validateUrl(post.getImage())))
+            return false;
+        if(!(this.validateCreationDate(post.getCreationDate())))
             return false;
         return true;
     }
@@ -64,5 +69,13 @@ public class PostService {
         Matcher matcher = pattern.matcher(image);
         return matcher.matches();
     }
-    
+
+    public boolean validateCreationDate(Date creationDate) {
+        if (creationDate.after(new Date())) {
+            return false;
+        }
+
+        return true;
+    }
+
 }

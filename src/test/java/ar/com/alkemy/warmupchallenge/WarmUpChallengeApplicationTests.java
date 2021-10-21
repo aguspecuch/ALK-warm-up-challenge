@@ -1,5 +1,7 @@
 package ar.com.alkemy.warmupchallenge;
 
+import java.util.Date;
+
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -12,6 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ar.com.alkemy.warmupchallenge.services.PostService;
 import ar.com.alkemy.warmupchallenge.services.UserService;
 import ar.com.alkemy.warmupchallenge.entities.User;
+import ar.com.alkemy.warmupchallenge.entities.Post;
 
 @SpringBootTest
 class WarmUpChallengeApplicationTests {
@@ -58,6 +61,39 @@ class WarmUpChallengeApplicationTests {
 		assertNull(userService.findByUsername("notRegisteredEmail@hotmail.com")); // Inexistent user with that email.
 		assertNotNull(userService.findByUserId(1));
 		assertNotNull(userService.findByUsername("alkemy@hotmail.com"));
+	}
+
+	// Tests that the data of the new post is valid.
+	@Test
+	void validatePostData() {
+
+		Post postOk = new Post();
+		postOk.setTitle("A valid title");
+		postOk.setContent("A valid content");
+		postOk.setImage("https://validurl.com/image.jpg");
+		postOk.setCategory("Test");
+		postOk.setCreationDate(new Date());
+		
+		assertTrue(postService.validateData(postOk));
+
+		Post postTitleNotOk = new Post();
+		postTitleNotOk.setTitle("Tito the dog"); // A post with the same title already exists.
+		postTitleNotOk.setContent("A valid content");
+		postTitleNotOk.setImage("https://validurl.com/image.jpg");
+		postTitleNotOk.setCategory("Test");
+		postTitleNotOk.setCreationDate(new Date());
+
+		assertFalse(postService.validateData(postTitleNotOk));
+
+		Post postImageNotOk = new Post();
+		postImageNotOk.setTitle("A valid title");
+		postImageNotOk.setContent("A valid content");
+		postImageNotOk.setImage("https://validurl.com/image"); // Not valid URL (doesn't end with .jpg, .png, .gif)
+		postImageNotOk.setCategory("Test");
+		postImageNotOk.setCreationDate(new Date());
+
+		assertFalse(postService.validateData(postImageNotOk));
+
 	}
 
 }
