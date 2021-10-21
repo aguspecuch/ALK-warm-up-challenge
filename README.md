@@ -19,4 +19,10 @@ Creacion de una API Rest para un blog, utilizando java11 + Spring boot. Los dato
 
 <h2>📚 Documentacion:</h2>
 
-- Documentacion de cada endpoint en Postman: <a href="https://documenter.getpostman.com/view/16169885/UUxzA7bN"> DOCUMENTACION</a>.
+- Documentacion de cada endpoint en Postman: <a href="https://documenter.getpostman.com/view/16169885/UV5ZCwuW"> DOCUMENTACION</a>.
+
+
+</br>
+</br>
+
+<p align="right">Hecho con ❤️ por <a href="https://www.linkedin.com/in/agustina-pecuch/">Agustina Pecuch</a>.</p>
