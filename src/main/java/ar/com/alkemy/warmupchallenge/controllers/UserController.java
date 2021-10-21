@@ -32,7 +32,7 @@ public class UserController {
 
         if (service.validateData(user)) {
             User u = service.register(user);
-            return ResponseEntity.ok("Registered user " + u.getUserId() +" successfully.");
+            return ResponseEntity.ok("Registered user " + u.getUserId() + " successfully.");
         }
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email/Password not valid.");

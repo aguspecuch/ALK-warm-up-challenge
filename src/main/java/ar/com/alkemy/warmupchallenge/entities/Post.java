@@ -101,5 +101,4 @@ public class Post {
         this.deleted = deleted;
     }
 
-    
 }
