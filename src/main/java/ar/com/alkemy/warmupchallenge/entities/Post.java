@@ -34,6 +34,7 @@ public class Post {
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
     @JsonIgnore
     private User user;
+    private boolean deleted = Boolean.FALSE;
 
     public Integer getPostId() {
         return postId;
@@ -91,4 +92,14 @@ public class Post {
         this.user = user;
         user.getPosts().add(this);
     }
+
+    public boolean isDeleted() {
+        return deleted;
+    }
+
+    public void setDeleted(boolean deleted) {
+        this.deleted = deleted;
+    }
+
+    
 }

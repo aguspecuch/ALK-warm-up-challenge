@@ -13,5 +13,6 @@ public interface PostRepository extends JpaRepository<Post, Integer>{
     Post findByPostId(Integer id);
     Post findByTitle(String title);
     List<Post> findByCategory(String category);
+    List<Post> findByDeleted(boolean deleted);
     
 }

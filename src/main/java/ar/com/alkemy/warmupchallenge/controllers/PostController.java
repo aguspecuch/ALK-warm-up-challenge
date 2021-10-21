@@ -34,6 +34,28 @@ public class PostController {
     UserService userService;
 
     @GetMapping
+    public ResponseEntity<List<PostResponse>> getAllActives() {
+
+        List<Post> posts = service.listAllActives();
+        posts.sort(Comparator.comparing(Post::getCreationDate).reversed());
+        List<PostResponse> list = new ArrayList<>();
+
+        for (Post post : posts) {
+
+            PostResponse p = new PostResponse();
+            p.postId = post.getPostId();
+            p.title = post.getTitle();
+            p.image = post.getImage();
+            p.category = post.getCategory();
+            p.creationDate = post.getCreationDate();
+
+            list.add(p);
+        }
+
+        return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/all")
     public ResponseEntity<List<PostResponse>> getAll() {
 
         List<Post> posts = service.listAll();

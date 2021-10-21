@@ -24,6 +24,10 @@ public class PostService {
         return repo.findAll();
     }
 
+    public List<Post> listAllActives() {
+        return repo.findByDeleted(false);
+    }
+
     public Post findById(Integer id) {
         return repo.findByPostId(id);
     }
@@ -41,7 +45,8 @@ public class PostService {
     }
 
     public void delete(Post post) {
-        repo.delete(post);
+        post.setDeleted(true);
+        this.update(post);
     }
 
     public boolean validateData(Post post) {
