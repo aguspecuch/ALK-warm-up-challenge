@@ -1,7 +1,8 @@
 package ar.com.alkemy.warmupchallenge.services;
 
-import java.util.Date;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,19 +16,7 @@ public class PostService {
     @Autowired
     PostRepository repo;
 
-    @Autowired
-    UserService userService;
-
-    public Post create(String title, String content, String image, String category, Date creationDate, Integer userId) {
-
-        Post post = new Post();
-        post.setTitle(title);
-        post.setContent(content);
-        post.setImage(image);
-        post.setCategory(category);
-        post.setCreationDate(creationDate);
-        post.setUser(userService.findByUserId(userId));
-        
+    public Post create(Post post) {
         return repo.save(post);
     }
 
@@ -53,6 +42,22 @@ public class PostService {
 
     public void delete(Post post) {
         repo.delete(post);
+    }
+
+    public boolean validateData(Post post) {
+        if ( this.findById(post.getPostId()) != null ) 
+            return false;
+        if ( !(this.validateUrl(post.getImage())))
+            return false;
+        return true;
+    }
+
+    public boolean validateUrl(String image) {
+
+        String regex = "([^\\s]+(\\.(?i)(jpe?g|png|gif))$)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(image);
+        return matcher.matches();
     }
     
 }

@@ -4,6 +4,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.alkemy.warmupchallenge.entities.User;
 import ar.com.alkemy.warmupchallenge.models.request.LoginRequest;
-import ar.com.alkemy.warmupchallenge.models.response.GenericResponse;
 import ar.com.alkemy.warmupchallenge.models.response.LoginResponse;
 import ar.com.alkemy.warmupchallenge.services.UserService;
 import io.jsonwebtoken.Jwts;
@@ -28,29 +28,37 @@ public class UserController {
     UserService service;
 
     @PostMapping("/sign_up")
-    public ResponseEntity<GenericResponse> signUp(@RequestBody User user) {
+    public ResponseEntity<?> signUp(@RequestBody User user) {
 
-        User u = service.register(user);
-        GenericResponse r = new GenericResponse();
-        r.isOk = true;
-        r.id = u.getUserId();
-        r.message = "Registered user successfully.";
+        if (service.validateData(user)) {
+            User u = service.register(user);
+            return ResponseEntity.ok("Registered user " + u.getUserId() +" successfully.");
+        }
 
-        return ResponseEntity.ok(r);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email/Password not valid.");
+
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest req) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest req) {
 
-        User u = service.login(req.username, req.password);
-        String token = getJWTToken(u.getEmail());
+        User u = service.findByUsername(req.username);
 
-        LoginResponse r = new LoginResponse();
-        r.id = u.getUserId();
-        r.username = u.getEmail();
-        r.token = token;
+        if (u == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User doesn't exist");
+        }
 
-        return ResponseEntity.ok(r);
+        if (service.login(req.username, req.password)) {
+            String token = getJWTToken(u.getEmail());
+            LoginResponse r = new LoginResponse();
+            r.id = u.getUserId();
+            r.username = u.getEmail();
+            r.token = token;
+            return ResponseEntity.ok(r);
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Incorrect password.");
+
     }
 
     private String getJWTToken(String username) {

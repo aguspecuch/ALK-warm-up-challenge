@@ -1,7 +1,9 @@
 package ar.com.alkemy.warmupchallenge.services;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Service;
 
 import ar.com.alkemy.warmupchallenge.entities.User;
@@ -23,16 +25,15 @@ public class UserService {
         return repo.save(u);
     }
 
-    public User login(String username, String password) {
+    public boolean login(String username, String password) {
 
         User u = this.findByUsername(username);
 
-        if (u == null || !u.getPassword().equals(Crypto.encrypt(password, u.getEmail().toLowerCase()))) {
-
-            throw new BadCredentialsException("User or password invalid.");
+        if (!u.getPassword().equals(Crypto.encrypt(password, u.getEmail().toLowerCase()))) {
+            return false;
         }
 
-        return u;
+        return true;
 
     }
 
@@ -43,5 +44,31 @@ public class UserService {
     public User findByUserId(Integer id) {
         return repo.findByUserId(id);
     }
+
+    public boolean validateData(User user) {
+
+        if (this.findByUsername(user.getEmail()) != null)
+            return false;
+        if (!(this.isUsernameValid(user.getEmail())))
+            return false;
+        // if (!(this.isPasswordValid(user.getPassword())))
+        //     return false;
+
+        return true;
+    }
+
+    public boolean isUsernameValid(String username) {
+        String regex = "^[A-Za-z0-9+_.-]+@(.+)$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(username);
+        return matcher.matches();
+    }
+
+    // public boolean isPasswordValid(String password) {
+    //     String regex = "(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=])(?=\\S+$).{8,}";
+    //     Pattern pattern = Pattern.compile(regex);
+    //     Matcher matcher = pattern.matcher(password);
+    //     return matcher.matches();
+    // }
 
 }

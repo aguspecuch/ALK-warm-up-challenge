@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import ar.com.alkemy.warmupchallenge.entities.Post;
 import ar.com.alkemy.warmupchallenge.models.request.PostRequest;
-import ar.com.alkemy.warmupchallenge.models.response.GenericResponse;
 import ar.com.alkemy.warmupchallenge.models.response.PostResponse;
 import ar.com.alkemy.warmupchallenge.services.PostService;
 import ar.com.alkemy.warmupchallenge.services.UserService;
@@ -36,7 +35,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<List<PostResponse>> getAll() {
-        
+
         List<Post> posts = service.listAll();
         posts.sort(Comparator.comparing(Post::getCreationDate).reversed());
         List<PostResponse> list = new ArrayList<>();
@@ -60,67 +59,62 @@ public class PostController {
     public ResponseEntity<?> findById(@PathVariable Integer id) {
 
         Post post = service.findById(id);
-        if ( post != null ) {
+        if (post != null) {
             return ResponseEntity.ok(post);
         }
 
-        GenericResponse r = new GenericResponse();
-        r.isOk = false;
-        r.message = "PostID not found";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(r);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No post was found with that ID");
     }
 
     @GetMapping(params = "title")
-    public ResponseEntity<?> findByTitle(@RequestParam(value="title") String title){
+    public ResponseEntity<?> findByTitle(@RequestParam(value = "title") String title) {
 
         Post p = service.findByTitle(title);
-        GenericResponse r = new GenericResponse();
 
-        if ( p != null ) {
+        if (p != null) {
             return ResponseEntity.ok(p);
         }
 
-        r.isOk = false;
-        r.message = "Title not found";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(r);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Title not found");
     }
 
     @GetMapping(params = "category")
-    public ResponseEntity<?> findByCategory(@RequestParam(value="category") String category){
-        
-        List<Post> p = service.findByCategory(category);
-        GenericResponse r = new GenericResponse();
+    public ResponseEntity<?> findByCategory(@RequestParam(value = "category") String category) {
 
-        if ( p != null ) {
+        List<Post> p = service.findByCategory(category);
+
+        if (p != null) {
             return ResponseEntity.ok(p);
         }
 
-        r.isOk = false;
-        r.message = "Category not found";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(r);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Category not found");
     }
 
     @PostMapping
-    public ResponseEntity<GenericResponse> create(@RequestBody PostRequest req) {
+    public ResponseEntity<?> create(@RequestBody PostRequest req) {
 
-        Post post = service.create(req.title, req.content, req.image, req.category, req.creationDate, req.userId);
-        GenericResponse r = new GenericResponse();
-        r.isOk = true;
-        r.id = post.getPostId();
-        r.message = "Post created with succes";
+        Post post = new Post();
+        post.setTitle(req.title);
+        post.setContent(req.content);
+        post.setImage(req.image);
+        post.setCategory(req.category);
+        post.setCreationDate(req.creationDate);
+        post.setUser(userService.findByUserId(req.userId));
 
-        return ResponseEntity.ok(r);
+        if (service.validateData(post)) {
+            service.create(post);
+            return ResponseEntity.ok("Post " + post.getPostId() + " created with succes");
+        }
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid data");
+
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<?> update(@PathVariable Integer id, @RequestBody PostRequest req) {
         Post p = service.findById(id);
-        GenericResponse r = new GenericResponse();
 
-        if ( p != null ) {
+        if (p != null) {
             p.setTitle(req.title);
             p.setContent(req.content);
             p.setImage(req.image);
@@ -129,37 +123,23 @@ public class PostController {
             p.setUser(userService.findByUserId(req.userId));
             service.update(p);
 
-            r.isOk = true;
-            r.id = p.getPostId();
-            r.message = "Post updated with succes.";
-
-            return ResponseEntity.ok(r);
+            return ResponseEntity.ok("Post " + p.getPostId() + " updated with succes.");
         }
 
-        r.isOk = false;
-        r.message = "PostId not found.";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(r);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PostId not found.");
     }
-    
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> delete(@PathVariable Integer id) {
 
         Post p = service.findById(id);
-        GenericResponse r = new GenericResponse();
-        
-        if ( p != null ) {
-            service.delete(p);
-            r.isOk = true;
-            r.message = "Post deleted with succes.";
 
-            return ResponseEntity.ok(r);
+        if (p != null) {
+            service.delete(p);
+            return ResponseEntity.ok("Post " + id + " deleted with succes.");
         }
 
-        r.isOk = false;
-        r.message = "PostId not found";
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(r);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("PostId not found");
     }
-    
+
 }
